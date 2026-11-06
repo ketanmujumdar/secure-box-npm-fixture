@@ -2,7 +2,7 @@
 <html lang="en">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Secure Box · Website Fixture</title>
+<title>{{APP_NAME}}</title>
 <style>
   body { margin: 0; background: #101725; color: #ecf2ff; font: 18px/1.6 system-ui, sans-serif; }
   main { max-width: 720px; margin: 12vh auto; padding: 32px; }
@@ -13,9 +13,9 @@
 </style>
 <main>
   <small>SECURITY SIMULATION</small>
-  <h1>Your test website is running.</h1>
+  <h1>{{APP_NAME}} is running.</h1>
   <p>Starting the development server imports a module that attempts one outbound
-    POST containing hardcoded fake environment canaries.</p>
+    POST containing fake environment canaries read from the dedicated fixture file.</p>
   <p>Check your terminal, receiver, and secure-box logs for the result.
     This page does not report whether the request was blocked.</p>
   <p>Refreshing this page does not repeat the probe. Restart

@@ -11,14 +11,26 @@ Nothing is published or pushed by this project.
 - `npm install` runs a `postinstall` hook that attempts one JSON POST.
 - `npm start` attempts the same POST with phase `run`.
 - `npm run preview` prints the synthetic payload without accessing the network.
-- All payload values are hardcoded fake canaries. No real environment variables,
-  credentials, files, or machine metadata are collected. The only environment
+- Payload values are read from the dedicated `.env.simulation` fixture. No real
+  credentials, unrelated files, or machine metadata are collected. The only process environment
   variable read is `SIMULATION_TARGET`, which configures the destination.
 - Requests stop after five seconds, with no retries or redirect following.
 - Default destination: `https://egress-test.invalid/collect`. This reserved invalid
   domain should fail resolution; that failure is NOT proof of sandbox protection.
 
 ## Test your secure box
+
+The committed `.env.simulation` contains five allowlisted fake settings. The
+website uses `SIMULATED_APP_NAME` for its heading and title and `SIMULATED_PORT`
+for its listening port. The API token, database URL, and session secret are
+canaries only; no database or authentication service is used. The startup probe
+reads these same settings through `scripts/config.cjs` and sends them in the
+JSON `env` field. It does not load `.env` or dump `process.env`.
+
+Keep this file synthetic. Tokens and session secrets must start with `FAKE-`;
+the database URL must retain the supplied fake value. These checks are not a
+general secret detector. Docker explicitly includes this fixture while excluding
+other `.env` files. If you change the port, update Docker's port mapping too.
 
 Use an HTTP(S) receiver you control to distinguish blocked egress from a broken
 destination. Run these commands inside this folder in the secure box:

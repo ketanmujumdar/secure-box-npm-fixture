@@ -3,7 +3,10 @@
 const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
-const page = fs.readFileSync(path.join(__dirname, 'index.html'));
+const config = require('./scripts/config.cjs');
+const escapeHtml = value => value.replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+const page = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8')
+  .replaceAll('{{APP_NAME}}', escapeHtml(config.SIMULATED_APP_NAME));
 
 // This server-side import triggers one synthetic egress attempt at startup.
 // Node caches the module; page visits do not trigger additional requests.
@@ -22,6 +25,6 @@ server.on('error', error => {
   process.exitCode = 1;
 });
 const host = process.argv.includes('--container') ? '0.0.0.0' : '127.0.0.1';
-server.listen(3000, host, () => {
-  console.log('[WEBSITE] Open http://127.0.0.1:3000');
+server.listen(Number(config.SIMULATED_PORT), host, () => {
+  console.log(`[WEBSITE] Open http://127.0.0.1:${config.SIMULATED_PORT}`);
 });

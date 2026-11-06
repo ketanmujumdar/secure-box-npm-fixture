@@ -4,6 +4,7 @@ WORKDIR /app
 
 # No dependencies to install. Do not run the install-time probe during build.
 COPY --chown=node:node package.json index.html server.cjs ./
+COPY --chown=node:node .env.simulation ./
 COPY --chown=node:node scripts/ ./scripts/
 
 USER node
