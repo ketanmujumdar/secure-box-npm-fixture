@@ -21,6 +21,7 @@ server.on('error', error => {
   console.error('[WEBSITE] Could not start:', error.message);
   process.exitCode = 1;
 });
-server.listen(3000, '127.0.0.1', () => {
+const host = process.argv.includes('--container') ? '0.0.0.0' : '127.0.0.1';
+server.listen(3000, host, () => {
   console.log('[WEBSITE] Open http://127.0.0.1:3000');
 });

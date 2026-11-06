@@ -60,6 +60,45 @@ npm install --ignore-scripts
 That command should not run the probe. It does not establish network isolation;
 `npm start` remains a separate execution test.
 
+## Docker
+
+Build from this folder:
+
+```sh
+docker build -t secure-box-npm-fixture .
+```
+
+Run with a receiver you control (replace the placeholder URL):
+
+```sh
+docker run --rm --init -p 127.0.0.1:3000:3000 \
+  -e SIMULATION_TARGET=https://YOUR-CONTROLLED-HOST/collect \
+  secure-box-npm-fixture
+```
+
+Open `http://127.0.0.1:3000`. Container startup runs Node directly with the same
+server-side import used by `npm run dev`, triggering one synthetic POST. The
+image runs as a non-root user. No npm install hook runs during image build,
+because this project has no dependencies. Building may download the Node base
+image; that is separate from the simulation request.
+
+For a network-disabled comparison:
+
+```sh
+docker run --rm --init --network none \
+  -e SIMULATION_TARGET=https://YOUR-CONTROLLED-HOST/collect \
+  secure-box-npm-fixture
+```
+
+The website process stays alive, but it is not reachable from the host with
+`--network none`. Inspect the probe's terminal output and stop with Ctrl+C.
+Docker's network isolation is a baseline; to test your secure box's own policy,
+run the container under that policy and inspect its logs.
+
+Inside Docker, `127.0.0.1` refers to the container. For the optional collector
+running on your host with Docker Desktop, use
+`http://host.docker.internal:8787/collect` as the target instead.
+
 ## Optional local baseline
 
 In one terminal:
